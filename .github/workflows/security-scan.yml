@@ -3,9 +3,9 @@ name: Container Security Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -22,9 +22,17 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t secure-flask:latest .
+          docker build --pull --no-cache -t secure-flask:latest .
 
-      - name: Run Trivy Vulnerability Scanner
+      - name: Run Trivy Table Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: secure-flask:latest
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+
+      - name: Run Trivy SARIF Scan
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: secure-flask:latest
